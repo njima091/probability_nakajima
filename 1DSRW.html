@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Animated Random Walk Visualization</title>
+</head>
+<body>
+<canvas id="randomWalkCanvas" width="800" height="600" style="border:1px solid #000000;"></canvas>
+
+<script>
+    const canvas = document.getElementById('randomWalkCanvas');
+    const ctx = canvas.getContext('2d');
+    const n = 100; // Number of steps
+    let xList = [400]; // Start in the middle of the canvas
+    let yList = [300]; // Start in the middle of the canvas
+    let i = 1; // Current step
+
+    function animate() {
+        if (i < n) {
+            const val = Math.floor(Math.random() * 2) + 1;
+            if (val == 1) {
+                xList.push(xList[i - 1] + 10); // Adjust step size for visibility
+                yList.push(yList[i - 1] + 10);
+            } else {
+                xList.push(xList[i - 1] + 10); // Adjust step size for visibility
+                yList.push(yList[i - 1] - 10);
+            }
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+
+            // Begin a new path for the updated line
+            ctx.beginPath();
+            ctx.moveTo(xList[0], yList[0]);
+
+            // Draw line to new point
+            for (let j = 1; j <= i; j++) {
+                ctx.lineTo(xList[j], yList[j]);
+            }
+
+            ctx.strokeStyle = 'red';
+            ctx.stroke();
+
+            i++; // Increment step
+            window.requestAnimationFrame(animate); // Request next frame
+        }
+    }
+
+    animate(); // Start the animation
+</script>
+</body>
+</html>
