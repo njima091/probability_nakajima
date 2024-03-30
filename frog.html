@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Random Walk Animation</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const n = 100;
+        const length = n;
+        const size = 2 * n + 1;
+        const rangeMin = -n;
+        let fstateArray = Array.from({ length: size }, () => Array(size).fill(0));
+        let fplacesArray = Array.from({ length: size }, () => Array(size).fill(null));
+
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                const n = rangeMin + i;
+                const m = rangeMin + j;
+                fplacesArray[i][j] = { x: n, y: m };
+            }
+        }
+
+        fstateArray[length][length] = 1; // Initial state
+
+        function movePoint(point, maxLength) {
+            let { x, y } = point;
+            const moves = ['+x', '-x', '+y', '-y'];
+            const move = moves[Math.floor(Math.random() * moves.length)];
+
+            switch (move) {
+                case '+x': x += 1; break;
+                case '-x': x -= 1; break;
+                case '+y': y += 1; break;
+                case '-y': y -= 1; break;
+            }
+
+            x = Math.max(-maxLength, Math.min(maxLength, x));
+            y = Math.max(-maxLength, Math.min(maxLength, y));
+
+            return { x, y };
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            ctx.fillStyle = 'black';
+
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    if (fstateArray[i][j] === 1) {
+                        const point = fplacesArray[i][j];
+                        ctx.fillRect(400 + point.x * 4, 400 + point.y * 4, 4, 4); // Adjust drawing as needed
+                    }
+                }
+            }
+        }
+
+        function update() {
+            const tempStateArray = fstateArray.map(row => [...row]);
+
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    if (fstateArray[i][j] === 1) {
+                        const newPoint = movePoint(fplacesArray[i][j], length);
+                        if (0 <= newPoint.x - rangeMin && newPoint.x - rangeMin < size && 0 <= newPoint.y - rangeMin && newPoint.y - rangeMin < size) {
+                            tempStateArray[newPoint.x - rangeMin][newPoint.y - rangeMin] = 1;
+                            fplacesArray[newPoint.x - rangeMin][newPoint.y - rangeMin] = newPoint;
+                        }
+                    }
+                }
+            }
+
+            fstateArray = tempStateArray;
+            draw(); // Redraw the canvas with updated points
+            requestAnimationFrame(update); // Request the next frame for the animation
+        }
+
+        update(); // Start the animation loop
+    </script>
+</body>
+</html>
